@@ -3,8 +3,8 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import LocationsAdmin from './LocationsAdmin'
 
-export default function AdminLocationsPage() {
-  const locations = getAllDeliveryLocations()
+export default async function AdminLocationsPage() {
+  const locations = await getAllDeliveryLocations()
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -45,13 +45,13 @@ export default function AdminLocationsPage() {
           <div className="grid md:grid-cols-3 gap-4 mt-6">
             <div className="bg-green-50 p-4 rounded-lg border border-green-200">
               <div className="text-2xl font-bold text-green-600">
-                {locations.filter(l => l.active === 1).length}
+                {locations.filter(l => l.active === true).length}
               </div>
               <div className="text-sm text-green-700">Activos</div>
             </div>
             <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
               <div className="text-2xl font-bold text-gray-600">
-                {locations.filter(l => l.active === 0).length}
+                {locations.filter(l => l.active === false).length}
               </div>
               <div className="text-sm text-gray-700">Inactivos</div>
             </div>

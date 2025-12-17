@@ -17,8 +17,8 @@ interface Location {
   longitude: number
   phone: string | null
   hours: string | null
-  active: number
-  created_at: string
+  active?: boolean
+  created_at?: string
 }
 
 interface LocationsAdminProps {
@@ -262,7 +262,7 @@ export default function LocationsAdmin({ initialLocations }: LocationsAdminProps
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
                   <h4 className="font-semibold text-lg">{location.name}</h4>
-                  {location.active === 1 ? (
+                  {location.active === true ? (
                     <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full font-medium">
                       Activo
                     </span>
@@ -291,9 +291,9 @@ export default function LocationsAdmin({ initialLocations }: LocationsAdminProps
                 <button
                   onClick={() => handleToggle(location.id)}
                   className="p-2 text-gray-600 hover:text-primary-500"
-                  title={location.active === 1 ? 'Desactivar' : 'Activar'}
+                  title={location.active === true ? 'Desactivar' : 'Activar'}
                 >
-                  {location.active === 1 ? (
+                  {location.active === true ? (
                     <ToggleRight className="h-6 w-6 text-green-500" />
                   ) : (
                     <ToggleLeft className="h-6 w-6" />
