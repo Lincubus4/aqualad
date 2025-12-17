@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import LocationsAdmin from './LocationsAdmin'
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminLocationsPage() {
   const locations = await getAllDeliveryLocations()
 

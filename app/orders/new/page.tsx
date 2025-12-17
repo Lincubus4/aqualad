@@ -2,6 +2,8 @@ import { getProducts } from '@/lib/queries'
 import Link from 'next/link'
 import { ArrowLeft, Droplet, Plus } from 'lucide-react'
 
+export const dynamic = 'force-dynamic'
+
 export default async function NewOrderPage() {
   const products = await getProducts()
 
