@@ -48,7 +48,9 @@ export async function initDatabase() {
         name VARCHAR(100) NOT NULL,
         size INTEGER NOT NULL,
         price DECIMAL(10, 2) NOT NULL,
-        description TEXT
+        description TEXT,
+        points_reward INTEGER DEFAULT 10,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `;
 
@@ -74,7 +76,21 @@ export async function initDatabase() {
         name VARCHAR(200) NOT NULL,
         email VARCHAR(200),
         phone VARCHAR(20),
-        address TEXT
+        loyalty_points INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+
+    // Crear tabla de direcciones
+    await sql`
+      CREATE TABLE IF NOT EXISTS addresses (
+        id SERIAL PRIMARY KEY,
+        customer_id INTEGER REFERENCES customers(id),
+        address TEXT NOT NULL,
+        latitude DECIMAL(10, 8),
+        longitude DECIMAL(11, 8),
+        is_default BOOLEAN DEFAULT false,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `;
 
@@ -83,12 +99,22 @@ export async function initDatabase() {
       CREATE TABLE IF NOT EXISTS orders (
         id SERIAL PRIMARY KEY,
         customer_id INTEGER REFERENCES customers(id),
-        location_id INTEGER REFERENCES delivery_locations(id),
+        address_id INTEGER REFERENCES addresses(id),
+        total DECIMAL(10, 2) NOT NULL,
+        status VARCHAR(50) DEFAULT 'pending',
+        points_earned INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+
+    // Crear tabla de items de orden
+    await sql`
+      CREATE TABLE IF NOT EXISTS order_items (
+        id SERIAL PRIMARY KEY,
+        order_id INTEGER REFERENCES orders(id),
         product_id INTEGER REFERENCES products(id),
         quantity INTEGER NOT NULL,
-        total_price DECIMAL(10, 2) NOT NULL,
-        status VARCHAR(50) DEFAULT 'pending',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        price DECIMAL(10, 2) NOT NULL
       );
     `;
 

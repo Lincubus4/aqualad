@@ -2,8 +2,8 @@ import { getProducts } from '@/lib/queries'
 import Link from 'next/link'
 import { ArrowLeft, Droplet, Plus } from 'lucide-react'
 
-export default function NewOrderPage() {
-  const products = getProducts()
+export default async function NewOrderPage() {
+  const products = await getProducts()
 
   return (
     <main className="min-h-screen bg-gray-50">
