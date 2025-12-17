@@ -1,4 +1,4 @@
-import db from './database'
+import { sql } from '@vercel/postgres'
 
 export interface DeliveryLocation {
   id: number
@@ -8,39 +8,48 @@ export interface DeliveryLocation {
   longitude: number
   phone: string | null
   hours: string | null
-  active: number
-  created_at: string
+  active?: boolean
+  created_at?: string
 }
 
-// Get all delivery locations
-export const getDeliveryLocations = () => {
-  return db.prepare('SELECT * FROM delivery_locations WHERE active = 1 ORDER BY name').all() as DeliveryLocation[]
+// Get all delivery locations (active only)
+export const getDeliveryLocations = async (): Promise<DeliveryLocation[]> => {
+  const { rows } = await sql<DeliveryLocation>`
+    SELECT * FROM delivery_locations 
+    WHERE active = true 
+    ORDER BY name
+  `
+  return rows
 }
 
 // Get all locations (including inactive) - for admin
-export const getAllDeliveryLocations = () => {
-  return db.prepare('SELECT * FROM delivery_locations ORDER BY created_at DESC').all() as DeliveryLocation[]
+export const getAllDeliveryLocations = async (): Promise<DeliveryLocation[]> => {
+  const { rows } = await sql<DeliveryLocation>`
+    SELECT * FROM delivery_locations 
+    ORDER BY created_at DESC
+  `
+  return rows
 }
 
 // Add new delivery location
-export const addDeliveryLocation = (
+export const addDeliveryLocation = async (
   name: string,
   address: string,
   latitude: number,
   longitude: number,
   phone: string | null,
   hours: string | null
-) => {
-  const stmt = db.prepare(`
+): Promise<number> => {
+  const { rows } = await sql`
     INSERT INTO delivery_locations (name, address, latitude, longitude, phone, hours)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `)
-  const result = stmt.run(name, address, latitude, longitude, phone, hours)
-  return result.lastInsertRowid
+    VALUES (${name}, ${address}, ${latitude}, ${longitude}, ${phone}, ${hours})
+    RETURNING id
+  `
+  return rows[0].id
 }
 
 // Update delivery location
-export const updateDeliveryLocation = (
+export const updateDeliveryLocation = async (
   id: number,
   name: string,
   address: string,
@@ -48,29 +57,34 @@ export const updateDeliveryLocation = (
   longitude: number,
   phone: string | null,
   hours: string | null
-) => {
-  const stmt = db.prepare(`
+): Promise<void> => {
+  await sql`
     UPDATE delivery_locations
-    SET name = ?, address = ?, latitude = ?, longitude = ?, phone = ?, hours = ?
-    WHERE id = ?
-  `)
-  stmt.run(name, address, latitude, longitude, phone, hours, id)
+    SET name = ${name}, 
+        address = ${address}, 
+        latitude = ${latitude}, 
+        longitude = ${longitude}, 
+        phone = ${phone}, 
+        hours = ${hours}
+    WHERE id = ${id}
+  `
 }
 
 // Toggle location active status
-export const toggleLocationActive = (id: number) => {
-  const stmt = db.prepare(`
+export const toggleLocationActive = async (id: number): Promise<void> => {
+  await sql`
     UPDATE delivery_locations
-    SET active = CASE WHEN active = 1 THEN 0 ELSE 1 END
-    WHERE id = ?
-  `)
-  stmt.run(id)
+    SET active = NOT active
+    WHERE id = ${id}
+  `
 }
 
 // Delete delivery location
-export const deleteDeliveryLocation = (id: number) => {
-  const stmt = db.prepare('DELETE FROM delivery_locations WHERE id = ?')
-  stmt.run(id)
+export const deleteDeliveryLocation = async (id: number): Promise<void> => {
+  await sql`
+    DELETE FROM delivery_locations 
+    WHERE id = ${id}
+  `
 }
 
 // Calculate distance between two points (Haversine formula)
@@ -92,8 +106,12 @@ export const calculateDistance = (
 }
 
 // Get nearest locations to user
-export const getNearestLocations = (userLat: number, userLon: number, limit: number = 5) => {
-  const locations = getDeliveryLocations()
+export const getNearestLocations = async (
+  userLat: number, 
+  userLon: number, 
+  limit: number = 5
+): Promise<Array<DeliveryLocation & { distance: number }>> => {
+  const locations = await getDeliveryLocations()
   
   const locationsWithDistance = locations.map(loc => ({
     ...loc,
@@ -104,3 +122,4 @@ export const getNearestLocations = (userLat: number, userLon: number, limit: num
     .sort((a, b) => a.distance - b.distance)
     .slice(0, limit)
 }
+

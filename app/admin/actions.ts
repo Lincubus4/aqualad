@@ -17,7 +17,7 @@ export async function createLocation(formData: FormData) {
   const hours = formData.get('hours') as string || null
 
   try {
-    addDeliveryLocation(name, address, latitude, longitude, phone, hours)
+    await addDeliveryLocation(name, address, latitude, longitude, phone, hours)
     revalidatePath('/admin/locations')
     revalidatePath('/map')
     return { success: true, message: 'Ubicación creada exitosamente' }
@@ -35,7 +35,7 @@ export async function updateLocation(id: number, formData: FormData) {
   const hours = formData.get('hours') as string || null
 
   try {
-    updateDeliveryLocation(id, name, address, latitude, longitude, phone, hours)
+    await updateDeliveryLocation(id, name, address, latitude, longitude, phone, hours)
     revalidatePath('/admin/locations')
     revalidatePath('/map')
     return { success: true, message: 'Ubicación actualizada exitosamente' }
@@ -46,7 +46,7 @@ export async function updateLocation(id: number, formData: FormData) {
 
 export async function toggleLocation(id: number) {
   try {
-    toggleLocationActive(id)
+    await toggleLocationActive(id)
     revalidatePath('/admin/locations')
     revalidatePath('/map')
     return { success: true, message: 'Estado actualizado' }
@@ -57,7 +57,7 @@ export async function toggleLocation(id: number) {
 
 export async function removeLocation(id: number) {
   try {
-    deleteDeliveryLocation(id)
+    await deleteDeliveryLocation(id)
     revalidatePath('/admin/locations')
     revalidatePath('/map')
     return { success: true, message: 'Ubicación eliminada' }

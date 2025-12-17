@@ -16,6 +16,7 @@ export interface DeliveryLocation {
   longitude: number;
   phone?: string;
   hours?: string;
+  active?: boolean;
 }
 
 export interface Customer {
@@ -60,7 +61,9 @@ export async function initDatabase() {
         latitude DECIMAL(10, 8) NOT NULL,
         longitude DECIMAL(11, 8) NOT NULL,
         phone VARCHAR(20),
-        hours VARCHAR(100)
+        hours VARCHAR(100),
+        active BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `;
 
