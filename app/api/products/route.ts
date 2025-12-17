@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server'
-import { getProducts } from '@/lib/product-queries'
+import { getProducts } from '@/lib/db-postgres'
 
 export async function GET() {
   try {
-    const products = getProducts()
+    const products = await getProducts()
     return NextResponse.json(products)
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 })
